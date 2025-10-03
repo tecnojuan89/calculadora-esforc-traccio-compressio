@@ -1,0 +1,1 @@
+# calculadora-esforc-traccio-compressio
