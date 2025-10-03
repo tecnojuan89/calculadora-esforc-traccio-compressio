@@ -1,1 +1,248 @@
-<!doctype html><title>placeholder</title>
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Aula d'Estructures · Vibe Coding Educatiu UI</title>
+  <style>
+    :root{
+      --bg-top:#0b1226;
+      --bg-bottom:#0f172a;
+      --card:rgba(17,24,39,.78);
+      --border:rgba(148,163,184,.15);
+      --border-strong:rgba(148,163,184,.35);
+      --text:#e5e7eb;
+      --muted:#94a3b8;
+      --accent:#38bdf8;
+      --accent-2:#a78bfa;
+      --shadow:0 24px 60px rgba(0,0,0,.45);
+      --radius-card:20px;
+      --radius:14px;
+      --dur:300ms;
+      --ease:cubic-bezier(.22,1,.36,1);
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      min-height:100vh;
+      font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans";
+      color:var(--text);
+      background:radial-gradient(circle at top,var(--bg-top) 0%,rgba(11,18,38,.92) 45%,var(--bg-bottom) 100%);
+    }
+    main{
+      max-width:1100px;
+      margin:0 auto;
+      padding:72px 24px 64px;
+      display:grid;
+      gap:32px;
+    }
+    header{
+      display:grid;
+      gap:18px;
+      text-align:center;
+    }
+    h1{
+      margin:0;
+      font-size:clamp(30px,5vw,48px);
+      font-weight:800;
+      letter-spacing:.4px;
+    }
+    .tagline{
+      margin:0 auto;
+      max-width:720px;
+      color:var(--muted);
+      font-size:clamp(16px,2.6vw,18px);
+      line-height:1.6;
+    }
+    .hero-card{
+      position:relative;
+      overflow:hidden;
+      background:linear-gradient(135deg,rgba(56,189,248,.22),rgba(167,139,250,.18));
+      border:1px solid rgba(148,163,184,.22);
+      border-radius:var(--radius-card);
+      box-shadow:var(--shadow);
+      padding:28px;
+      display:grid;
+      gap:18px;
+      justify-items:center;
+    }
+    .hero-card::before{
+      content:"";
+      position:absolute;
+      inset:-40% -20% auto;
+      height:300px;
+      background:radial-gradient(circle at center,rgba(56,189,248,.4),transparent 60%);
+      filter:blur(40px);
+      opacity:.65;
+      pointer-events:none;
+    }
+    .hero-card h2{
+      margin:0;
+      font-size:clamp(22px,3vw,30px);
+      font-weight:700;
+    }
+    .hero-card p{margin:0;color:var(--muted);text-align:center;max-width:640px;line-height:1.6;}
+    .cta-buttons{
+      display:flex;
+      flex-wrap:wrap;
+      gap:12px;
+      justify-content:center;
+      position:relative;
+      z-index:1;
+    }
+    a.button{
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      padding:14px 22px;
+      border-radius:999px;
+      border:1px solid transparent;
+      background:linear-gradient(120deg,var(--accent),var(--accent-2));
+      color:#0b1226;
+      font-weight:700;
+      text-decoration:none;
+      box-shadow:0 18px 40px rgba(56,189,248,.28);
+      transition:transform var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+    }
+    a.button:hover{transform:translateY(-2px);box-shadow:0 24px 55px rgba(56,189,248,.34);}
+    a.button.secondary{
+      background:rgba(15,23,42,.65);
+      color:var(--text);
+      border-color:rgba(148,163,184,.22);
+      box-shadow:none;
+    }
+    a.button.secondary:hover{border-color:rgba(148,163,184,.38);}
+    section.apps{
+      display:grid;
+      gap:22px;
+    }
+    .apps-header{
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      text-align:center;
+    }
+    .apps-header h2{margin:0;font-size:clamp(24px,3.2vw,32px);font-weight:700;}
+    .apps-header p{margin:0;color:var(--muted);}
+    .app-grid{
+      display:grid;
+      gap:18px;
+      grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+    }
+    .app-card{
+      position:relative;
+      background:var(--card);
+      border:1px solid var(--border);
+      border-radius:18px;
+      padding:24px;
+      display:grid;
+      gap:18px;
+      box-shadow:var(--shadow);
+      transition:border-color var(--dur) var(--ease), transform var(--dur) var(--ease);
+    }
+    .app-card:hover{border-color:var(--border-strong);transform:translateY(-2px);}
+    .app-card h3{margin:0;font-size:20px;font-weight:700;}
+    .app-card p{margin:0;color:var(--muted);line-height:1.5;}
+    .app-card .pill{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:6px 12px;
+      border-radius:999px;
+      background:rgba(56,189,248,.12);
+      border:1px solid rgba(56,189,248,.35);
+      color:var(--accent);
+      font-size:12px;
+      font-weight:700;
+    }
+    .app-card .actions{
+      display:flex;
+      justify-content:flex-start;
+      gap:12px;
+    }
+    .app-card .actions a{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:10px 16px;
+      border-radius:var(--radius);
+      text-decoration:none;
+      font-weight:600;
+      color:#0b1226;
+      background:linear-gradient(120deg,var(--accent),var(--accent-2));
+      box-shadow:0 12px 30px rgba(56,189,248,.26);
+      transition:transform var(--dur) var(--ease);
+    }
+    .app-card .actions a:hover{transform:translateY(-2px);}
+    .app-card .actions .soon{
+      background:rgba(15,23,42,.6);
+      color:var(--muted);
+      border:1px dashed rgba(148,163,184,.35);
+      box-shadow:none;
+      pointer-events:none;
+    }
+    footer{
+      text-align:center;
+      padding:12px 24px 36px;
+      color:var(--muted);
+      font-size:13px;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <h1>Aula d'Estructures i Esforços</h1>
+      <p class="tagline">Recull d'eines interactives perquè l'alumnat experimenti amb els conceptes de tracció, compressió i deformacions dins del marc de Vibe Coding Educatiu UI.</p>
+      <div class="hero-card">
+        <h2>Explora, simula i compara comportaments de materials</h2>
+        <p>Accedeix a la col·lecció d'aplicacions creades per al teu curs de Tecnologia. Comença amb la calculadora d'esforç de tracció/compressió i prepara't per afegir-hi més experiències d'aprenentatge actiu.</p>
+        <div class="cta-buttons">
+          <a class="button" href="apps/calculadora-traccio.html">Obrir calculadora d'esforç</a>
+          <a class="button secondary" href="#apps">Veure totes les apps</a>
+        </div>
+      </div>
+    </header>
+
+    <section id="apps" class="apps" aria-labelledby="apps-title">
+      <div class="apps-header">
+        <h2 id="apps-title">Apps disponibles</h2>
+        <p>Selecciona una app per començar a treballar o revisa les que s'incorporaran pròximament.</p>
+      </div>
+      <div class="app-grid">
+        <article class="app-card">
+          <span class="pill">Nova · Interactiva</span>
+          <div>
+            <h3>Calculadora d'Esforç de Tracció / Compressió</h3>
+            <p>Introdueix dades de força, geometria i límit elàstic per calcular tensions, deformacions i comparar ràpidament σ i E.</p>
+          </div>
+          <div class="actions">
+            <a href="apps/calculadora-traccio.html" aria-label="Obrir la calculadora d'esforç">Entrar</a>
+          </div>
+        </article>
+        <article class="app-card">
+          <span class="pill">Nova · Visual</span>
+          <div>
+            <h3>Simulador d'Esforços de Tracció i Compressió</h3>
+            <p>Manipula la força aplicada a una viga i observa com varien la tensió, la deformació i la longitud final amb animacions amplificades.</p>
+          </div>
+          <div class="actions">
+            <a href="apps/simulador-esforcos.html" aria-label="Obrir el simulador d'esforços">Entrar</a>
+          </div>
+        </article>
+        <article class="app-card" aria-disabled="true">
+          <span class="pill">Properament</span>
+          <div>
+            <h3>Laboratori d'Estabilitat de Columnes</h3>
+            <p>Experimenta amb el fenomen de flambatge per diferents condicions de contorn. Estigues atent a les novetats.</p>
+          </div>
+          <div class="actions">
+            <a class="soon" href="#">En construcció</a>
+          </div>
+        </article>
+      </div>
+    </section>
+  </main>
+  <footer>Fet per Juan Arambul · Recursos interactius per al tema d'Estructures i Esforços</footer>
+</body>
+</html>
