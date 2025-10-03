@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Calculadora d'Esforç de Tracció / Compressió · Vibe Coding Educatiu UI</title>
+<style>
+  /* =========================
+     PALETA (NO CANVIAR)
+     ========================= */
+  :root{
+    --bg-top:#0b1226;           /* gradient fons */
+    --bg-bottom:#0f172a;
+    --card:rgba(17,24,39,.75);  /* targeta */
+    --border:rgba(148,163,184,.15);
+    --border-strong:rgba(148,163,184,.30);
+    --text:#e5e7eb;
+    --muted:#94a3b8;
+    --accent:#38bdf8;           /* primari / sliders / icones */
+    --accent-2:#a78bfa;         /* gradient destacat */
+    --danger:#ef4444;           /* errors */
+    --shadow:0 20px 50px rgba(0,0,0,.45);
+    --radius-card:16px;
+    --radius:12px;
+    --radius-input:10px;
+    --dur:300ms; /* micro-animacions */
+    --ease:cubic-bezier(.22,1,.36,1); /* easeOutCubic */
+  }
+
+  /* =========================
+     RESET BÀSIC + TIPOGRAFIA
+     ========================= */
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;
+    font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans";
+    color:var(--text);
+    background:linear-gradient(to bottom,var(--bg-top),var(--bg-bottom));
+    display:grid;
+    place-items:start center;
+  }
+  .wrap{
+    width:100%;
+    max-width:960px;            /* layout màx. 960px */
+    padding:24px;               /* padding base */
+    padding-top:56px;           /* 🔧 més espai superior demanat */
+  }
+
+  /* =========================
+     CARD PRINCIPAL
+     ========================= */
+  .card{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:var(--radius-card);
+    box-shadow:var(--shadow);
+    backdrop-filter:blur(6px);
+    padding:24px;
+    transition:border-color var(--dur) var(--ease), transform var(--dur) var(--ease);
+  }
+  .card:focus-within{ border-color:var(--border-strong); transform:translateY(-1px) }
+
+  h1{
+    margin:0 0 8px;
+    font-size:clamp(22px,2.8vw,32px); /* Títol */
+    font-weight:800;
+    letter-spacing:.2px;
+  }
+  .sub{color:var(--muted); margin-bottom:18px}
+
+  /* =========================
+     LAYOUT FORM / CONTROLS
+     ========================= */
+  .grid{
+    display:grid;
+    gap:16px;
+  }
+  @media(min-width:720px){
+    .grid.cols-2{ grid-template-columns:1fr 1fr }
+    .grid.cols-3{ grid-template-columns:repeat(3,1fr) }
+  }
+
+  label{ font-size:13px; color:var(--muted); display:block; margin-bottom:8px }
+
+  .row{
+    background:rgba(15,23,42,.35);
+    border:1px solid var(--border-strong);
+    border-radius:12px;
+    padding:14px;
+  }
+
+  /* =========================
+     SEGMENTED CONTROL (píndola)
+     ========================= */
+  .seg{
+    display:inline-flex;
+    gap:6px;
+    padding:6px;
+    background:rgba(148,163,184,.08);
+    border:1px solid var(--border);
+    border-radius:999px;
+  }
+  .seg input{ position:absolute; opacity:0; pointer-events:none }
+  .seg label{
+    position:relative;
+    z-index:1;
+    cursor:pointer;
+    user-select:none;
+    padding:8px 12px;
+    border-radius:999px;
+    font-weight:600;
+    color:var(--text);
+    transition:transform var(--dur) var(--ease), color var(--dur) var(--ease);
+  }
+  .seg label:hover{ transform:translateY(-1px) }
+  .seg .pill{
+    position:absolute; inset:auto;
+    height:32px;
+    border-radius:999px;
+    background:var(--accent);
+    transition: left var(--dur) var(--ease), width var(--dur) var(--ease);
+    z-index:0;
+  }
+  .segwrap{ position:relative; display:inline-block }
+
+  /* =========================
+     INPUTS I BOTONS
+     ========================= */
+  .control{
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  input[type="number"], input[type="text"]{
+    width:100%;
+    background:rgba(2,6,23,.55);
+    border:1px solid var(--border-strong);
+    color:var(--text);
+    border-radius:var(--radius-input);
+    padding:10px 12px;
+    outline:none;
+    transition:border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease), transform var(--dur) var(--ease);
+    font-variant-numeric: tabular-nums;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New";
+  }
+  input[type="number"]:focus, input[type="text"]:focus{
+    border-color:var(--accent);
+    box-shadow:0 0 0 3px rgba(56,189,248,.15);
+    transform:translateY(-1px);
+  }
+
+  input[type="range"]{
+    width:100%;
+    accent-color:var(--accent); /* accent primari */
+  }
+
+  .btns{ display:flex; gap:12px; flex-wrap:wrap }
+  button{
+    border:0;
+    padding:12px 16px;
+    border-radius:var(--radius);
+    background:var(--accent);
+    color:#0b1226;
+    font-weight:700;
+    cursor:pointer;
+    transition:transform var(--dur) var(--ease), opacity var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+    box-shadow:0 10px 30px rgba(56,189,248,.25);
+  }
+  button:hover{ transform:translateY(-1px) }
+  button:disabled{ opacity:.5; cursor:not-allowed; box-shadow:none }
+
+  /* =========================
+     STATS (k-v)
+     ========================= */
+  .stats{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+    gap:12px;
+    margin-top:8px;
+  }
+  .stat{
+    background:rgba(2,6,23,.45);
+    border:1px solid var(--border);
+    border-radius:12px;
+    padding:12px;
+  }
+  .k{ font-size:12px; color:var(--muted); margin-bottom:6px }
+  .v{
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New";
+    font-size:16px;
+  }
+
+  /* =========================
+     MISSATGES / VALIDACIÓ
+     ========================= */
+  .error{
+    color:var(--danger);
+    font-size:13px;
+    margin-top:6px;
+  }
+
+  /* =========================
+     VISUAL SVG (comparativa)
+     ========================= */
+  .viz{
+    width:100%;
+    height:140px;
+    border:1px solid var(--border);
+    border-radius:12px;
+    background:linear-gradient(90deg, rgba(56,189,248,.08), rgba(167,139,250,.08));
+    position:relative;
+    overflow:hidden;
+  }
+  .bar{
+    position:absolute; left:0; top:0; bottom:0;
+    background:linear-gradient(90deg,var(--accent),var(--accent-2));
+    width:0%;
+    transition:width var(--dur) var(--ease);
+  }
+  .ref{
+    position:absolute; top:0; bottom:0;
+    width:2px;
+    background: repeating-linear-gradient(
+      to bottom,
+      rgba(148,163,184,.6) 0,
+      rgba(148,163,184,.6) 6px,
+      rgba(148,163,184,0) 6px,
+      rgba(148,163,184,0) 12px
+    ); /* línia discontínua de referència */
+  }
+  .viz-label{
+    position:absolute; bottom:8px; left:12px; right:12px;
+    display:flex; justify-content:space-between; font-size:12px; color:var(--muted)
+  }
+  .chip{
+    display:inline-flex; align-items:center; gap:6px;
+    padding:6px 10px; border-radius:999px; font-weight:700; font-size:12px;
+    background:rgba(2,6,23,.6); border:1px solid var(--border);
+  }
+
+  /* =========================
+     PEU DE PÀGINA (no modificar)
+     ========================= */
+  footer{
+    margin-top:18px;
+    color:var(--muted);
+    font-size:12px;
+    text-align:center;
+  }
+</style>
+</head>
+<body>
+  <main class="wrap">
+    <section class="card" aria-labelledby="ttl">
+      <h1 id="ttl">Calculadora d'Esforç de Tracció / Compressió</h1>
+      <p class="sub">Tracció / compressió, allargament i conversions d’unitats. Introdueix les dades, prem <strong>Calcular</strong> i consulta si el material <em>suporta</em> (σ &lt; E), està <em>en perill</em> (σ = E) o <em>es trenca</em> (σ &gt; E).</p>
+
+      <!-- FORMULES: blocs informatius -->
+      <div class="row" aria-live="polite">
+        <div class="grid cols-3">
+          <div>
+            <label>Esforç (tensió)</label>
+            <div class="chip" aria-label="Fórmula d'esforç">σ = F / A · [Pa]</div>
+            <div style="margin-top:6px; color:var(--muted); font-size:12px">F en newtons (N), A en m². 1 MPa = 10<sup>6</sup> Pa; 1 GPa = 10<sup>9</sup> Pa.</div>
+          </div>
+          <div>
+            <label>Allargament (deformació)</label>
+            <div class="chip" aria-label="Fórmula d'allargament">ε = ΔL / L₀ · [—]</div>
+            <div style="margin-top:6px; color:var(--muted); font-size:12px">Sense unitats. Per a % multiplica per 100.</div>
+          </div>
+          <div>
+            <label>Àrees</label>
+            <div class="chip" aria-label="Àrea cercle">A<sub>cercle</sub> = π·r²</div>
+            <div class="chip" aria-label="Àrea rectangle" style="margin-left:6px">A<sub>rectangle</sub> = ample·alt</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SELECCIÓ D’ÀREA -->
+      <div class="row">
+        <label>Com vols introduir l’àrea?</label>
+        <div class="segwrap" role="tablist" aria-label="Mode d'entrada de l'àrea">
+          <div class="seg" id="segArea">
+            <div class="pill" aria-hidden="true"></div>
+            <input type="radio" name="areaMode" id="md-directa" value="directa" checked />
+            <label role="tab" for="md-directa" data-index="0">Àrea directa</label>
+            <input type="radio" name="areaMode" id="md-rectangle" value="rectangle" />
+            <label role="tab" for="md-rectangle" data-index="1">Rectangle</label>
+            <input type="radio" name="areaMode" id="md-cercle" value="cercle" />
+            <label role="tab" for="md-cercle" data-index="2">Cercle</label>
+          </div>
+        </div>
+
+        <div class="grid cols-3" style="margin-top:12px">
+          <!-- Àrea directa -->
+          <div id="area-directa">
+            <label for="area">Àrea A [m²]</label>
+            <input id="area" type="number" step="any" inputmode="decimal" placeholder="p. ex. 0.0005" aria-label="Àrea directa en metres quadrats">
+          </div>
+          <!-- Rectangle -->
+          <div id="area-rectangle" hidden>
+            <label for="ample">Ample [m]</label>
+            <input id="ample" type="number" step="any" inputmode="decimal" placeholder="p. ex. 0.02" aria-label="Ample del rectangle en metres">
+          </div>
+          <div id="area-rectangle-2" hidden>
+            <label for="alt">Alt [m]</label>
+            <input id="alt" type="number" step="any" inputmode="decimal" placeholder="p. ex. 0.01" aria-label="Alt del rectangle en metres">
+          </div>
+          <!-- Cercle -->
+          <div id="area-cercle" hidden>
+            <label for="radi">Radi r [m]</label>
+            <input id="radi" type="number" step="any" inputmode="decimal" placeholder="p. ex. 0.005" aria-label="Radi del cercle en metres">
+          </div>
+        </div>
+        <div id="msg-area" class="error" role="alert" aria-live="assertive"></div>
+      </div>
+
+      <!-- FORÇA, LONGITUDS I LÍMIT ELÀSTIC -->
+      <div class="grid cols-2">
+        <div class="row">
+          <label for="forca">Força F [N]</label>
+          <input id="forca" type="number" step="any" inputmode="decimal" placeholder="p. ex. 1200" aria-label="Força aplicada en newtons">
+          <div id="msg-forca" class="error" role="alert"></div>
+        </div>
+        <div class="row">
+          <div class="grid cols-2">
+            <div>
+              <label for="L0">Longitud inicial L₀ [m]</label>
+              <input id="L0" type="number" step="any" inputmode="decimal" placeholder="p. ex. 1.2" aria-label="Longitud inicial">
+            </div>
+            <div>
+              <label for="dL">Increment de longitud ΔL [m]</label>
+              <input id="dL" type="number" step="any" inputmode="decimal" placeholder="p. ex. 0.003" aria-label="Increment de longitud">
+            </div>
+          </div>
+          <div id="msg-l" class="error" role="alert"></div>
+        </div>
+      </div>
+
+      <div class="row">
+        <label>Límit elàstic E</label>
+        <div class="grid cols-3">
+          <div class="control">
+            <input id="E" type="number" step="any" inputmode="decimal" placeholder="p. ex. 210" aria-label="Valor de E">
+          </div>
+          <div class="segwrap" aria-label="Unitat de E">
+            <div class="seg" id="segUnit">
+              <div class="pill" aria-hidden="true"></div>
+              <input type="radio" name="unitE" id="u-pa" value="Pa" />
+              <label for="u-pa" data-index="0">Pa</label>
+              <input type="radio" name="unitE" id="u-mpa" value="MPa" checked />
+              <label for="u-mpa" data-index="1">MPa</label>
+              <input type="radio" name="unitE" id="u-gpa" value="GPa" />
+              <label for="u-gpa" data-index="2">GPa</label>
+            </div>
+          </div>
+          <div>
+            <label for="E-range">Ajust fi</label>
+            <input id="E-range" type="range" min="0" max="1000" step="1" aria-label="Control lliscant per al valor de E">
+          </div>
+        </div>
+        <div id="msg-e" class="error" role="alert"></div>
+      </div>
+
+      <!-- BOTONS -->
+      <div class="btns" style="margin-top:6px">
+        <button id="calc" aria-label="Calcular resultats">Calcular</button>
+        <button id="reset" aria-label="Reiniciar valors" type="button">Reset</button>
+      </div>
+
+      <!-- RESULTATS -->
+      <div class="row" style="margin-top:16px">
+        <label>Resultats</label>
+        <div class="stats" aria-live="polite">
+          <div class="stat"><div class="k">Àrea efectiva A [m²]</div><div class="v" id="out-area">—</div></div>
+          <div class="stat"><div class="k">Esforç σ [Pa]</div><div class="v" id="out-sigma-pa">—</div></div>
+          <div class="stat"><div class="k">Esforç σ [MPa]</div><div class="v" id="out-sigma-mpa">—</div></div>
+          <div class="stat"><div class="k">Esforç σ [GPa]</div><div class="v" id="out-sigma-gpa">—</div></div>
+          <div class="stat"><div class="k">Allargament ε [—]</div><div class="v" id="out-eps">—</div></div>
+          <div class="stat"><div class="k">Allargament ε [%]</div><div class="v" id="out-eps-pct">—</div></div>
+          <div class="stat"><div class="k">Límit elàstic E [Pa]</div><div class="v" id="out-e-pa">—</div></div>
+        </div>
+
+        <!-- Visual comparador σ vs E -->
+        <div style="margin-top:14px">
+          <div class="viz" role="img" aria-label="Comparació visual entre σ i E">
+            <div class="bar" id="viz-bar" aria-hidden="true"></div>
+            <div class="ref" id="viz-ref" aria-hidden="true" style="left:80%"></div>
+            <div class="viz-label">
+              <span>0</span>
+              <span id="viz-mid">50%</span>
+              <span>100% de E</span>
+            </div>
+          </div>
+          <div style="margin-top:10px; display:flex; align-items:center; gap:8px">
+            <span id="badge" class="chip" aria-live="polite">—</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- CONVERSIONS RÀPIDES -->
+      <div class="row" style="margin-top:14px">
+        <label>Conversions ràpides (Pa ⇄ MPa ⇄ GPa)</label>
+        <div class="grid cols-3">
+          <div>
+            <label for="conv-pa">Pa</label>
+            <input id="conv-pa" type="number" step="any" inputmode="decimal" placeholder="p. ex. 210000000000">
+          </div>
+          <div>
+            <label for="conv-mpa">MPa</label>
+            <input id="conv-mpa" type="number" step="any" inputmode="decimal" placeholder="p. ex. 210000">
+          </div>
+          <div>
+            <label for="conv-gpa">GPa</label>
+            <input id="conv-gpa" type="number" step="any" inputmode="decimal" placeholder="p. ex. 210">
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <footer>Fet per Juan Arambul com a complement al tema d'Estructures i Esforços</footer>
+  </main>
+
+<script>
+/* ==========================================================
+   UTILS · format numèric ca-ES i clamp/lerp (interaccions)
+   ========================================================== */
+const fmt = (n, opts={}) => {
+  if (!isFinite(n)) return '—';
+  return new Intl.NumberFormat('ca-ES', Object.assign({maximumFractionDigits: 6}, opts)).format(n);
+};
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const lerp = (a, b, t) => a + (b-a)*t;
+
+/* ==========================================================
+   SEGMENTED CONTROL · píndola animada
+   ========================================================== */
+function initSegmented(segEl){
+  const pill = segEl.querySelector('.pill');
+  const labels = [...segEl.querySelectorAll('label')];
+  const inputs = [...segEl.querySelectorAll('input[type=radio]')];
+
+  function positionPill(){
+    const idx = inputs.findIndex(r => r.checked);
+    const target = labels[idx];
+    const r = target.getBoundingClientRect();
+    const sr = segEl.getBoundingClientRect();
+    pill.style.left = (target.offsetLeft)+'px';
+    pill.style.width = (r.width)+'px';
+  }
+  inputs.forEach(r=>r.addEventListener('change', positionPill));
+  window.addEventListener('resize', positionPill, {passive:true});
+  positionPill();
+}
+initSegmented(document.getElementById('segArea'));
+initSegmented(document.getElementById('segUnit'));
+
+/* ==========================================================
+   REFERÈNCIES D’ENTRADA
+   ========================================================== */
+const el = {
+  // modes d’àrea
+  areaMode: () => document.querySelector('input[name=areaMode]:checked').value,
+  area: document.getElementById('area'),
+  ample: document.getElementById('ample'),
+  alt: document.getElementById('alt'),
+  radi: document.getElementById('radi'),
+  msgArea: document.getElementById('msg-area'),
+
+  // força i longituds
+  forca: document.getElementById('forca'),
+  L0: document.getElementById('L0'),
+  dL: document.getElementById('dL'),
+  msgForca: document.getElementById('msg-forca'),
+  msgL: document.getElementById('msg-l'),
+
+  // E + unitat + slider sincronitzat
+  E: document.getElementById('E'),
+  ERange: document.getElementById('E-range'),
+  unitE: () => document.querySelector('input[name=unitE]:checked').value,
+  msgE: document.getElementById('msg-e'),
+
+  // botons
+  calc: document.getElementById('calc'),
+  reset: document.getElementById('reset'),
+
+  // sortides
+  outA: document.getElementById('out-area'),
+  outSigPa: document.getElementById('out-sigma-pa'),
+  outSigMPa: document.getElementById('out-sigma-mpa'),
+  outSigGPa: document.getElementById('out-sigma-gpa'),
+  outEps: document.getElementById('out-eps'),
+  outEpsPct: document.getElementById('out-eps-pct'),
+  outEPa: document.getElementById('out-e-pa'),
+  vizBar: document.getElementById('viz-bar'),
+  vizRef: document.getElementById('viz-ref'),
+  vizMid: document.getElementById('viz-mid'),
+  badge: document.getElementById('badge'),
+
+  // conversions
+  cPa: document.getElementById('conv-pa'),
+  cMPa: document.getElementById('conv-mpa'),
+  cGPa: document.getElementById('conv-gpa'),
+};
+
+/* ==========================================================
+   MOSTRAR BLOCS D’ÀREA segons mode
+   ========================================================== */
+const blocks = {
+  directa: ['area-directa'],
+  rectangle: ['area-rectangle','area-rectangle-2'],
+  cercle: ['area-cercle']
+};
+function updateAreaBlocks(){
+  document.getElementById('msg-area').textContent = '';
+  Object.values(blocks).flat().forEach(id=>{
+    const div = document.getElementById(id);
+    div.hidden = true;
+  });
+  blocks[el.areaMode()].forEach(id=>{
+    document.getElementById(id).hidden = false;
+  });
+}
+document.querySelectorAll('input[name=areaMode]').forEach(r=>r.addEventListener('change', updateAreaBlocks));
+updateAreaBlocks();
+
+/* ==========================================================
+   SYNC NUMBER <-> RANGE per a E (patró d’interacció)
+   ========================================================== */
+function rangeMaxForUnit(unit){
+  // escales útils per a alumnat
+  if(unit==='Pa') return 2e11;      // fins 200 GPa
+  if(unit==='MPa') return 400000;   // 400.000 MPa = 400 GPa
+  if(unit==='GPa') return 400;      // 400 GPa
+  return 1000;
+}
+
+function syncRangeFromNumber(){
+  const unit = el.unitE();
+  const val = parseFloat(el.E.value);
+  const max = rangeMaxForUnit(unit);
+  el.ERange.max = 1000; // slider de 0..1000
+  const t = isFinite(val) && max>0 ? clamp(val/max,0,1) : 0;
+  el.ERange.value = Math.round(t*1000);
+}
+function syncNumberFromRange(){
+  const unit = el.unitE();
+  const max = rangeMaxForUnit(unit);
+  const t = el.ERange.value/1000;
+  const val = t*max;
+  el.E.value = Number(val.toFixed(6));
+}
+el.E.addEventListener('input', syncRangeFromNumber);
+el.ERange.addEventListener('input', syncNumberFromRange);
+document.querySelectorAll('input[name=unitE]').forEach(r=>{
+  r.addEventListener('change', ()=>{
+    // mantenim el mateix % quan canvia la unitat
+    const t = el.ERange.value/1000;
+    const max = rangeMaxForUnit(el.unitE());
+    el.E.value = Number((t*max).toFixed(6));
+  });
+});
+
+/* ==========================================================
+   CONVERSIONS (MPa/GPa → Pa i viceversa)
+   ========================================================== */
+function setConv(from){
+  const pa = el.cPa, mpa = el.cMPa, gpa = el.cGPa;
+  if(from==='Pa'){
+    const v = parseFloat(pa.value);
+    if(!isFinite(v)) return;
+    mpa.value = v/1e6;
+    gpa.value = v/1e9;
+  }else if(from==='MPa'){
+    const v = parseFloat(mpa.value);
+    if(!isFinite(v)) return;
+    pa.value = v*1e6;
+    gpa.value = v/1e3;
+  }else if(from==='GPa'){
+    const v = parseFloat(gpa.value);
+    if(!isFinite(v)) return;
+    pa.value = v*1e9;
+    mpa.value = v*1e3;
+  }
+}
+el.cPa.addEventListener('input', ()=>setConv('Pa'));
+el.cMPa.addEventListener('input', ()=>setConv('MPa'));
+el.cGPa.addEventListener('input', ()=>setConv('GPa'));
+
+/* ==========================================================
+   VALIDACIÓ BÀSICA
+   ========================================================== */
+function setError(elm, msg){ elm.textContent = msg || '' }
+function readArea(){
+  const mode = el.areaMode();
+  if(mode==='directa'){
+    const A = parseFloat(el.area.value);
+    if(!(A>0)) { setError(el.msgArea,'Indica una àrea A vàlida (> 0).'); return null; }
+    setError(el.msgArea,'');
+    return A;
+  }
+  if(mode==='rectangle'){
+    const a = parseFloat(el.ample.value);
+    const h = parseFloat(el.alt.value);
+    if(!(a>0 && h>0)) { setError(el.msgArea,'Indica ample i alt (> 0).'); return null; }
+    setError(el.msgArea,'');
+    return a*h;
+  }
+  if(mode==='cercle'){
+    const r = parseFloat(el.radi.value);
+    if(!(r>0)) { setError(el.msgArea,'Indica un radi r (> 0).'); return null; }
+    setError(el.msgArea,'');
+    return Math.PI*r*r;
+  }
+  return null;
+}
+function readForce(){
+  const F = parseFloat(el.forca.value);
+  if(!(F>0)){ setError(el.msgForca,'La força F ha de ser > 0.'); return null; }
+  setError(el.msgForca,''); return F;
+}
+function readLengths(){
+  const L0 = parseFloat(el.L0.value);
+  const dL = parseFloat(el.dL.value);
+  if(!(L0>0)){ setError(el.msgL,'L₀ ha de ser > 0.'); return null; }
+  if(!isFinite(dL)){ setError(el.msgL,'Indica ΔL (pot ser 0).'); return null; }
+  setError(el.msgL,''); return {L0,dL};
+}
+function readE(){
+  const E = parseFloat(el.E.value);
+  const unit = el.unitE();
+  if(!(E>0)){ setError(el.msgE,'E ha de ser > 0.'); return null; }
+  setError(el.msgE,'');
+  // passem E a Pa
+  let Epa = E;
+  if(unit==='MPa') Epa = E*1e6;
+  if(unit==='GPa') Epa = E*1e9;
+  return {Epa, unit};
+}
+
+/* ==========================================================
+   CÀLCUL PRINCIPAL
+   ========================================================== */
+function calcular(){
+  const A = readArea();
+  const F = readForce();
+  const Ls = readLengths();
+  const Eobj = readE();
+  if([A,F,Ls,Eobj].some(v=>v===null)) return;
+
+  const sigma = F/A;            // Pa
+  const eps = Ls.dL / Ls.L0;    // — unitless
+
+  // sortides
+  el.outA.textContent = fmt(A);
+  el.outSigPa.textContent = fmt(sigma);
+  el.outSigMPa.textContent = fmt(sigma/1e6);
+  el.outSigGPa.textContent = fmt(sigma/1e9);
+  el.outEps.textContent = fmt(eps,{maximumFractionDigits:8});
+  el.outEpsPct.textContent = fmt(eps*100,{maximumFractionDigits:4});
+  el.outEPa.textContent = fmt(Eobj.Epa);
+
+  // comparació σ vs E
+  const ratio = sigma / Eobj.Epa;
+  const pct = clamp(ratio,0,1)*100; // per a la barra (cap a 100%)
+  el.vizBar.style.width = pct+'%';
+
+  // línia discontínua a 100% de E
+  el.vizRef.style.left = 'calc(100% - 1px)';
+  el.vizMid.textContent = '50%';
+
+  // missatge d’estat
+  let state = '';
+  if (Math.abs(ratio-1) < 1e-12){ state = 'En perill · σ = E'; }
+  else if (ratio < 1){ state = 'Suporta · σ < E'; }
+  else { state = 'Es trenca · σ > E'; }
+  el.badge.textContent = `${state}  (σ/E = ${fmt(ratio,{maximumFractionDigits:6})})`;
+}
+
+el.calc.addEventListener('click', calcular);
+
+/* ==========================================================
+   RESET
+   ========================================================== */
+function doReset(){
+  // buidem inputs
+  [el.area, el.ample, el.alt, el.radi, el.forca, el.L0, el.dL, el.E, el.cPa, el.cMPa, el.cGPa].forEach(i=>i.value='');
+  // reset selectors
+  document.getElementById('md-directa').checked = true;
+  document.getElementById('u-mpa').checked = true;
+  updateAreaBlocks();
+  initSegmented(document.getElementById('segArea'));
+  initSegmented(document.getElementById('segUnit'));
+  // reset slider / missatges
+  el.ERange.value = 0;
+  [el.msgArea, el.msgForca, el.msgL, el.msgE].forEach(m=>m.textContent='');
+  // reset sortides
+  ['out-area','out-sigma-pa','out-sigma-mpa','out-sigma-gpa','out-eps','out-eps-pct','out-e-pa']
+    .forEach(id=>document.getElementById(id).textContent='—');
+  el.vizBar.style.width = '0%';
+  el.badge.textContent = '—';
+}
+el.reset.addEventListener('click', doReset);
+
+/* ==========================================================
+   ACCESSIBILITAT: avís live quan es canvia mode d’àrea
+   ========================================================== */
+document.getElementById('segArea').addEventListener('change', ()=>{
+  const m = el.areaMode();
+  const map = {directa:'àrea directa en m²', rectangle:'dimensions de rectangle', cercle:'radi de cercle'};
+  el.msgArea.textContent = `Mode d’entrada: ${map[m]}.`;
+  setTimeout(()=>el.msgArea.textContent='', 1500);
+});
+
+/* ==========================================================
+   VALORS DEMO (opcional per facilitar proves)
+   ========================================================== */
+(function seed(){
+  // Exemple: barra acer: E ≈ 210 GPa
+  el.forca.value = 1200;
+  el.area.value = 0.0005;
+  el.L0.value = 1.2;
+  el.dL.value = 0.003;
+  document.getElementById('u-gpa').checked = true;
+  el.E.value = 210; // 210 GPa
+  syncRangeFromNumber();
+})();
+</script>
+</body>
+</html>
