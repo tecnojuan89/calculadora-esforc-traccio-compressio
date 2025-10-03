@@ -170,7 +170,7 @@ footer{ margin-top:18px; text-align:center; color:var(--muted); font-size:.9rem;
 <body>
   <main class="container" role="main">
     <section class="card" aria-labelledby="titol">
-      <h1 id="titol">Calculadora d'esforç — versió senzilla (SIEI)</h1>
+      <h1 id="titol">Calculadora d'esforç — versió senzilla</h1>
       <p class="subtle">Passos curts i valors tancats. Tria i comprova. Xifres en format <span class="mono">ca-ES</span>.</p>
 
       <!-- ===============================
@@ -338,11 +338,6 @@ footer{ margin-top:18px; text-align:center; color:var(--muted); font-size:.9rem;
           </div>
 
           <div class="row cols-2" style="margin-top:12px; align-items:end;">
-            <div>
-              <label class="small">Escriu la teua substitució (opcional):</label>
-              <input id="pasBuit" class="mono" type="text" placeholder="Ex.: σ = 1000 / 250 = 4 MPa"
-                     style="width:100%; background:#0f172a; color:var(--text); border:1px solid var(--border-strong); border-radius:10px; padding:10px 12px;">
-            </div>
             <div style="display:flex; gap:10px; justify-content:flex-end;">
               <button id="btnReset" class="btn" aria-label="Reinicia valors">Reinicia</button>
               <button id="btnCalc" class="btn" aria-label="Comprova">Comprova</button>
@@ -357,7 +352,7 @@ footer{ margin-top:18px; text-align:center; color:var(--muted); font-size:.9rem;
 
 <script>
 /* ======================================================================
-   🧠 JS — VERSIÓ SIEI
+   🧠 JS
    - Valors tancats via xips i segmentats (reducció de decisions)
    - Sync discret del lliscant de força amb els xips
    - Càlculs i visual SVG amb micro-animació (300 ms, easeOutCubic)
