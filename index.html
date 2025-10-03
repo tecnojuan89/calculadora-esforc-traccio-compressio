@@ -4,6 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Aula d'Estructures · Vibe Coding Educatiu UI</title>
+  <link rel="stylesheet" href="assets/css/shell.css" />
   <style>
     :root{
       --bg-top:#0b1226;
@@ -190,10 +191,14 @@
   </style>
 </head>
 <body>
+  <nav class="site-nav" aria-label="Navegació principal">
+    <a class="logo" href="index.html"><span>VC</span>Aula d'Estructures</a>
+    <a class="jump-link" href="#apps">Anar a les apps</a>
+  </nav>
   <main>
     <header>
       <h1>Aula d'Estructures i Esforços</h1>
-      <p class="tagline">Recull d'eines interactives perquè l'alumnat experimenti amb els conceptes de tracció, compressió i deformacions.</p>
+      <p class="tagline">Recull d'eines interactives perquè l'alumnat experimenti amb els conceptes de tracció, compressió i deformacions dins del marc de Vibe Coding Educatiu UI.</p>
       <div class="hero-card">
         <h2>Explora, simula i compara comportaments de materials</h2>
         <p>Accedeix a la col·lecció d'aplicacions creades per al teu curs de Tecnologia. Comença amb la calculadora d'esforç de tracció/compressió i prepara't per afegir-hi més experiències d'aprenentatge actiu.</p>
@@ -220,24 +225,24 @@
             <a href="apps/calculadora-traccio.html" aria-label="Obrir la calculadora d'esforç">Entrar</a>
           </div>
         </article>
-        <article class="app-card" aria-disabled="true">
-          <span class="pill">Properament</span>
+        <article class="app-card">
+          <span class="pill">Nova · Visual</span>
           <div>
-            <h3>Simulador de Flexió de Bigues</h3>
-            <p>Explora la relació entre càrregues distribuïdes, moments flectors i fletxes màximes. Disponible aviat.</p>
+            <h3>Simulador d'Esforços de Tracció i Compressió</h3>
+            <p>Manipula la força aplicada a una viga i observa com varien la tensió, la deformació i la longitud final amb animacions amplificades.</p>
           </div>
           <div class="actions">
-            <a class="soon" href="#">En construcció</a>
+            <a href="apps/simulador-esforcos.html" aria-label="Obrir el simulador d'esforços">Entrar</a>
           </div>
         </article>
-        <article class="app-card" aria-disabled="true">
-          <span class="pill">Properament</span>
+        <article class="app-card">
+          <span class="pill">Nova · Guiada</span>
           <div>
-            <h3>Laboratori d'Estabilitat de Columnes</h3>
-            <p>Experimenta amb el fenomen de flambatge per diferents condicions de contorn. Estigues atent a les novetats.</p>
+            <h3>Calculadora d'Esforç — Nivell Bàsic</h3>
+            <p>Segueix els passos guiats per calcular la tensió, la deformació i comprovar la seguretat amb opcions acotades.</p>
           </div>
           <div class="actions">
-            <a class="soon" href="#">En construcció</a>
+            <a href="apps/calculadora-esforc-senzilla.html" aria-label="Obrir la calculadora d'esforç bàsica">Entrar</a>
           </div>
         </article>
       </div>
