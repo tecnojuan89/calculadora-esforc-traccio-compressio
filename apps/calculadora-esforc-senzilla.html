@@ -36,6 +36,13 @@ html,body{
   color: var(--text);
   font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans";
 }
+body{
+  margin:0;
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+}
 code, .mono{
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New";
 }
@@ -43,16 +50,48 @@ code, .mono{
 /* ================================
    📐 LAYOUT
    ================================ */
+.top-nav{
+  width:100%;
+  max-width:960px;
+  padding:24px 24px 0;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+  flex-wrap:wrap;
+}
+.top-nav a.logo{
+  display:inline-flex;
+  align-items:center;
+  gap:10px;
+  text-decoration:none;
+  color:var(--text);
+  font-weight:800;
+  letter-spacing:.3px;
+}
+.top-nav a.logo span{
+  width:32px;
+  height:32px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:10px;
+  background:linear-gradient(135deg,rgba(56,189,248,.28),rgba(167,139,250,.24));
+  color:#0b1226;
+  font-weight:700;
+  box-shadow:0 12px 28px rgba(56,189,248,.24);
+}
+.top-nav .back-link{margin:0;}
 .container{
   max-width:960px;
+  width:100%;
   margin:0 auto;
-  padding:24px;
+  padding:32px 24px 24px;
 }
 .back-link{
   display:inline-flex;
   align-items:center;
   gap:8px;
-  margin-bottom:18px;
   padding:10px 16px;
   border-radius:999px;
   border:1px solid rgba(148,163,184,.35);
@@ -249,8 +288,11 @@ footer{
 </style>
 </head>
 <body>
+  <nav class="top-nav" aria-label="Navegació principal">
+    <a class="logo" href="../index.html"><span>VC</span>Aula d'Estructures</a>
+    <a class="back-link" href="../index.html" aria-label="Torna a la portada de l'Aula d'Estructures">← Torna a l'inici</a>
+  </nav>
   <main class="container" role="main">
-    <a class="back-link" href="../index.html">← Torna a l'inici</a>
     <section class="card" aria-labelledby="titol">
       <h1 id="titol">Calculadora d'esforç (σ) per a tracció/compressió — nivell bàsic</h1>
       <p class="subtle">App pensada per a l'alumnat amb més dificultats: opcions acotades, fórmules visibles i passos guiats. Totes les xifres es mostren amb format <span class="mono">ca-ES</span>.</p>

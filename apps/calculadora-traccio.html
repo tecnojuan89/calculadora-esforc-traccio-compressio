@@ -37,14 +37,48 @@
     font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans";
     color:var(--text);
     background:linear-gradient(to bottom,var(--bg-top),var(--bg-bottom));
-    display:grid;
-    place-items:start center;
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
   }
+  .top-nav{
+    width:100%;
+    max-width:960px;
+    padding:24px 24px 0;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:16px;
+    flex-wrap:wrap;
+  }
+  .top-nav a.logo{
+    display:inline-flex;
+    align-items:center;
+    gap:10px;
+    text-decoration:none;
+    color:var(--text);
+    font-weight:800;
+    letter-spacing:.3px;
+  }
+  .top-nav a.logo span{
+    width:32px;
+    height:32px;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    border-radius:10px;
+    background:linear-gradient(135deg,rgba(56,189,248,.28),rgba(167,139,250,.24));
+    color:#0b1226;
+    font-weight:700;
+    box-shadow:0 12px 28px rgba(56,189,248,.24);
+  }
+  .top-nav .back-link{margin:0;}
   .wrap{
     width:100%;
     max-width:960px;            /* layout màx. 960px */
     padding:24px;               /* padding base */
-    padding-top:56px;           /* 🔧 més espai superior demanat */
+    padding-top:40px;
   }
   .back-link{
     display:inline-flex;
@@ -271,8 +305,11 @@
 </style>
 </head>
 <body>
-  <main class="wrap">
+  <nav class="top-nav" aria-label="Navegació principal">
+    <a class="logo" href="../index.html"><span>VC</span>Aula d'Estructures</a>
     <a class="back-link" href="../index.html" aria-label="Torna a la portada de l'Aula d'Estructures">← Torna a l'inici</a>
+  </nav>
+  <main class="wrap">
     <section class="card" aria-labelledby="ttl">
       <h1 id="ttl">Calculadora d'Esforç de Tracció / Compressió</h1>
       <p class="sub">Tracció / compressió, allargament i conversions d’unitats. Introdueix les dades, prem <strong>Calcular</strong> i consulta si el material <em>suporta</em> (σ &lt; E), està <em>en perill</em> (σ = E) o <em>es trenca</em> (σ &gt; E).</p>
