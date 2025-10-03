@@ -4,6 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Calculadora d'Esforç Senzilla — Vibe Coding Educatiu UI</title>
+<link rel="stylesheet" href="../assets/css/shell.css" />
 <style>
 /* ================================
    🌈 PALETA (NO CANVIAR)
@@ -50,63 +51,14 @@ code, .mono{
 /* ================================
    📐 LAYOUT
    ================================ */
-.top-nav{
-  width:100%;
-  max-width:960px;
-  padding:24px 24px 0;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:16px;
-  flex-wrap:wrap;
-}
-.top-nav a.logo{
-  display:inline-flex;
-  align-items:center;
-  gap:10px;
-  text-decoration:none;
-  color:var(--text);
-  font-weight:800;
-  letter-spacing:.3px;
-}
-.top-nav a.logo span{
-  width:32px;
-  height:32px;
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  border-radius:10px;
-  background:linear-gradient(135deg,rgba(56,189,248,.28),rgba(167,139,250,.24));
-  color:#0b1226;
-  font-weight:700;
-  box-shadow:0 12px 28px rgba(56,189,248,.24);
-}
-.top-nav .back-link{margin:0;}
+nav.top-nav{margin-bottom:12px;}
 .container{
   max-width:960px;
   width:100%;
   margin:0 auto;
   padding:32px 24px 24px;
 }
-.back-link{
-  display:inline-flex;
-  align-items:center;
-  gap:8px;
-  padding:10px 16px;
-  border-radius:999px;
-  border:1px solid rgba(148,163,184,.35);
-  background:rgba(15,23,42,.55);
-  color:var(--muted);
-  font-weight:600;
-  text-decoration:none;
-  box-shadow:0 12px 28px rgba(15,23,42,.35);
-  transition:transform var(--transition), border-color var(--transition), color var(--transition);
-}
-.back-link:hover{
-  transform:translateY(-1px);
-  border-color:var(--accent);
-  color:var(--accent);
-}
+.card > .back-link{margin-bottom:18px;}
 .card{
   background: var(--card);
   border:1px solid var(--border);

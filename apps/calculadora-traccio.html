@@ -4,6 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Calculadora d'Esforç de Tracció / Compressió · Vibe Coding Educatiu UI</title>
+<link rel="stylesheet" href="../assets/css/shell.css" />
 <style>
   /* =========================
      PALETA (NO CANVIAR)
@@ -42,64 +43,13 @@
     flex-direction:column;
     align-items:center;
   }
-  .top-nav{
-    width:100%;
-    max-width:960px;
-    padding:24px 24px 0;
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap:16px;
-    flex-wrap:wrap;
-  }
-  .top-nav a.logo{
-    display:inline-flex;
-    align-items:center;
-    gap:10px;
-    text-decoration:none;
-    color:var(--text);
-    font-weight:800;
-    letter-spacing:.3px;
-  }
-  .top-nav a.logo span{
-    width:32px;
-    height:32px;
-    display:inline-flex;
-    align-items:center;
-    justify-content:center;
-    border-radius:10px;
-    background:linear-gradient(135deg,rgba(56,189,248,.28),rgba(167,139,250,.24));
-    color:#0b1226;
-    font-weight:700;
-    box-shadow:0 12px 28px rgba(56,189,248,.24);
-  }
-  .top-nav .back-link{margin:0;}
   .wrap{
     width:100%;
     max-width:960px;            /* layout màx. 960px */
     padding:24px;               /* padding base */
     padding-top:40px;
   }
-  .back-link{
-    display:inline-flex;
-    align-items:center;
-    gap:8px;
-    margin-bottom:18px;
-    padding:10px 16px;
-    border-radius:999px;
-    border:1px solid rgba(148,163,184,.35);
-    background:rgba(15,23,42,.55);
-    color:var(--muted);
-    font-weight:600;
-    text-decoration:none;
-    box-shadow:0 12px 28px rgba(15,23,42,.35);
-    transition:transform var(--dur) var(--ease), border-color var(--dur) var(--ease), color var(--dur) var(--ease);
-  }
-  .back-link:hover{
-    transform:translateY(-1px);
-    border-color:var(--accent);
-    color:var(--accent);
-  }
+  .wrap > .back-link{margin-bottom:18px;}
 
   /* =========================
      CARD PRINCIPAL
