@@ -90,9 +90,9 @@
       gap:8px;
     }
     .fraction{
-      display:grid;
-      grid-template-columns:auto 1fr auto auto;
-      align-items:center;
+      display:flex;
+      flex-direction:column;
+      align-items:flex-start;
       gap:16px;
       padding:18px;
       border:1px solid var(--border);
@@ -103,9 +103,18 @@
       font-size:18px;
       font-weight:700;
     }
+    .fraction-line{
+      display:flex;
+      gap:12px;
+      width:100%;
+      align-items:flex-start;
+    }
     .fraction-stack{
-      display:grid;
+      display:flex;
+      flex-direction:column;
       gap:10px;
+      width:100%;
+      max-width:220px;
     }
     .fraction-stack .row{
       display:flex;
@@ -118,6 +127,7 @@
     }
     .fraction-stack input{
       flex:1;
+      max-width:130px;
       border:0;
       background:transparent;
       color:var(--text);
@@ -134,8 +144,15 @@
       font-weight:600;
       white-space:nowrap;
     }
+    .sigma-output{
+      display:flex;
+      flex-direction:column;
+      gap:4px;
+      align-items:flex-start;
+    }
+    .result-label{font-size:14px;color:var(--muted);letter-spacing:.3px;text-transform:uppercase;}
     .result-value{
-      font-size:24px;
+      font-size:26px;
       font-weight:800;
       letter-spacing:.4px;
       font-variant-numeric:tabular-nums;
@@ -246,19 +263,24 @@
         <div class="sigma-identity">σ = F / A</div>
         <p class="formula-note">Introdueix la força en newtons i l'àrea en metres quadrats. σ es mostrarà en pascals (Pa).</p>
         <div class="fraction" role="group" aria-label="Càlcul de l'esforç">
-          <span class="fraction-label">σ =</span>
-          <div class="fraction-stack">
-            <label class="row" for="forca">
-              <input id="forca" type="number" inputmode="decimal" placeholder="F" aria-label="Força en newtons" />
-              <span class="unit">N</span>
-            </label>
-            <label class="row" for="area">
-              <input id="area" type="number" inputmode="decimal" placeholder="A" aria-label="Àrea en metres quadrats" />
-              <span class="unit">m²</span>
-            </label>
+          <div class="fraction-line">
+            <span class="fraction-label">σ =</span>
+            <div class="fraction-stack">
+              <label class="row" for="forca">
+                <input id="forca" type="number" inputmode="decimal" placeholder="F" aria-label="Força en newtons" />
+                <span class="unit">N</span>
+              </label>
+              <label class="row" for="area">
+                <input id="area" type="number" inputmode="decimal" placeholder="A" aria-label="Àrea en metres quadrats" />
+                <span class="unit">m²</span>
+              </label>
+            </div>
           </div>
-          <span class="result-value" id="sigma">—</span>
-          <span class="unit">Pa</span>
+          <div class="sigma-output" aria-live="polite">
+            <span class="result-label">Resultat</span>
+            <span class="result-value" id="sigma">—</span>
+            <span class="unit">Pa</span>
+          </div>
         </div>
       </div>
 
