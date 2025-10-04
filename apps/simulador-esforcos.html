@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Simulador d'Esforços: Tracció i Compressió</title>
+  <link rel="stylesheet" href="../assets/css/shell.css" />
+  <style>
+    :root{
+      --bg:#0f172a; /* slate-900 */
+      --card:#111827; /* gray-900 */
+      --muted:#94a3b8; /* slate-400 */
+      --text:#e5e7eb; /* gray-200 */
+      --accent:#38bdf8; /* sky-400 */
+      --ok:#22c55e; /* green-500 */
+      --warn:#f59e0b; /* amber-500 */
+      --err:#ef4444; /* red-500 */
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
+      background:linear-gradient(180deg,#0b1226,#0f172a);
+      color:var(--text);
+      min-height:100vh;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:flex-start;
+      padding:24px 24px 32px;
+      gap:16px;
+    }
+    .app{max-width:960px; width:100%; margin:0 auto;}
+    .card{background:rgba(17,24,39,.75); backdrop-filter: blur(6px); border:1px solid rgba(148,163,184,.15); border-radius:16px; padding:20px; box-shadow: 0 10px 30px rgba(2,6,23,.4); display:grid; gap:18px;}
+    h1{margin:0 0 8px; font-size:clamp(22px,2.8vw,32px); letter-spacing:.2px}
+    p.sub{margin:0 0 16px; color:var(--muted)}
+    fieldset{border:0; padding:0; margin:0 0 12px; display:flex; gap:12px; flex-wrap:wrap}
+    .segmented{display:inline-flex; background:#0b1226; border:1px solid rgba(148,163,184,.2); border-radius:999px; overflow:hidden}
+    .segmented input{display:none}
+    .segmented label{padding:10px 14px; cursor:pointer; color:var(--muted); user-select:none}
+    .segmented input:checked + label{background:var(--accent); color:#06121b; font-weight:600}
+    .row{display:flex; gap:14px; flex-wrap:wrap; align-items:end}
+    .field{flex:1; min-width:220px}
+    .field label{display:block; font-size:14px; color:var(--muted); margin:0 0 6px}
+    input[type="number"], input[type="range"]{width:100%}
+    input[type="number"]{background:#0b1226; color:var(--text); border:1px solid rgba(148,163,184,.3); border-radius:10px; padding:10px 12px; font-size:16px}
+    input[type="range"]{accent-color:var(--accent)}
+    button{background:var(--accent); color:#06121b; border:0; padding:12px 16px; border-radius:12px; font-weight:700; cursor:pointer}
+    button:disabled{opacity:.5; cursor:not-allowed}
+    .error{color:var(--err); font-size:14px; min-height:1.2em}
+
+    .canvas{margin-top:20px; background:radial-gradient(1200px 600px at 50% -20%, rgba(56,189,248,.15), transparent 60%), linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02)); border:1px solid rgba(148,163,184,.2); border-radius:16px; padding:16px}
+    .legend{display:flex; gap:16px; flex-wrap:wrap; align-items:center; justify-content:space-between; color:var(--muted); font-size:14px}
+    .stats{display:grid; grid-template-columns: repeat(auto-fit,minmax(180px,1fr)); gap:10px; margin-top:10px}
+    .stat{background:rgba(2,6,23,.5); border:1px solid rgba(148,163,184,.15); border-radius:12px; padding:10px}
+    .stat .k{color:var(--muted); font-size:12px}
+    .stat .v{font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; font-size:16px}
+
+    /* Contenidor de la viga */
+    .beam-wrap{display:flex; align-items:center; justify-content:center; padding:20px}
+    svg{max-width:100%; height:auto}
+    .note{color:var(--muted); font-size:12px; margin-top:6px}
+    .footer{margin-top:18px; color:var(--muted); font-size:13px}
+    .app{margin-top:8px;}
+  </style>
+</head>
+<body>
+  <nav class="top-nav" aria-label="Navegació principal">
+    <a class="logo" href="../index.html"><span>VC</span>Aula d'Estructures</a>
+    <a class="back-link" href="../index.html" aria-label="Torna a la portada">← Torna a l'inici</a>
+  </nav>
+  <div class="app card">
+    <h1>Simulador d'Esforços: Tracció i Compressió</h1>
+    <p class="sub">Tria el tipus d'esforç, introdueix la força (10 000 N – 200 000 N) i observa com canvia la longitud de la viga. L'animació està <em>amplificada visualment</em> per fer visible la deformació, però també es mostren els valors teòrics.</p>
+
+    <form id="form">
+      <fieldset aria-label="Tipus d'esforç">
+        <div class="segmented" role="tablist" aria-label="Tipus d'esforç">
+          <input type="radio" name="mode" id="tension" value="tension" checked>
+          <label for="tension">Tracció</label>
+          <input type="radio" name="mode" id="compression" value="compression">
+          <label for="compression">Compressió</label>
+        </div>
+      </fieldset>
+
+      <div class="row">
+        <div class="field">
+          <label for="force">Força aplicada (N)</label>
+          <input id="force" name="force" type="number" inputmode="numeric" min="10000" max="200000" step="1000" value="10000" required>
+          <div class="error" id="err"></div>
+        </div>
+        <div class="field">
+          <label for="forceRange">Ajust ràpid</label>
+          <input id="forceRange" type="range" min="10000" max="200000" step="1000" value="10000">
+        </div>
+        <div>
+          <button id="run" type="submit">Simula</button>
+          <button id="reset" type="button" aria-label="Reinicia">Reset</button>
+        </div>
+      </div>
+    </form>
+
+    <div class="canvas" aria-live="polite">
+      <div class="legend">
+        <div>
+          <strong>Viga rectangular</strong> · vista 2D · longitud inicial <span id="L0label"></span>
+        </div>
+        <div>
+          Material: <strong>Acer</strong> (E = <span id="Elabel"></span>) · Secció: <strong>50 mm × 50 mm</strong> (A = <span id="Alabel"></span>)
+        </div>
+      </div>
+
+      <div class="beam-wrap">
+        <!-- Escena SVG -->
+        <svg id="scene" viewBox="0 0 860 220" aria-label="Escena de viga">
+          <!-- suports -->
+          <g id="clamps" transform="translate(30,40)">
+            <rect id="clampLeft" x="-20" y="0" width="20" height="140" fill="#64748b" opacity="0.7"/>
+            <rect id="clampRight" x="780" y="0" width="20" height="140" fill="#64748b" opacity="0.7"/>
+          </g>
+
+          <!-- viga -->
+          <g id="beamGroup" transform="translate(30,40)">
+            <!-- Viga de referència (sense deformar) -->
+            <rect id="beamRef" x="0" y="40" width="800" height="60" rx="8"
+                  fill="none" stroke="rgba(148,163,184,.4)" stroke-dasharray="8 6" />
+            <!-- Viga activa -->
+            <rect id="beam" x="0" y="40" width="800" height="60" rx="8" 
+                  fill="url(#grad)" stroke="rgba(148,163,184,.6)" />
+          </g>
+
+          <!-- fletxes / marcadors -->
+          <g id="arrows" transform="translate(30,40)"></g>
+
+          <defs>
+            <linearGradient id="grad" x1="0%" x2="100%" y1="0%" y2="0%">
+              <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.9"/>
+              <stop offset="100%" stop-color="#a78bfa" stop-opacity="0.9"/>
+            </linearGradient>
+          </defs>
+        </svg>
+      </div>
+
+      <div class="stats">
+        <div class="stat"><div class="k">Tipus</div><div class="v" id="statMode">Tracció</div></div>
+        <div class="stat"><div class="k">F (N)</div><div class="v" id="statF">10 000</div></div>
+        <div class="stat"><div class="k">σ = F/A (Pa)</div><div class="v" id="statSigma">—</div></div>
+        <div class="stat"><div class="k">ε = σ/E (—)</div><div class="v" id="statEps">—</div></div>
+        <div class="stat"><div class="k">ΔL = ε·L (m)</div><div class="v" id="statDelta">—</div></div>
+        <div class="stat"><div class="k">Longitud final (m)</div><div class="v" id="statLf">—</div></div>
+      </div>
+
+      <p class="note">Nota: La deformació teòrica és molt petita per als materials reals. Per apreciar-la en pantalla, l'animació empra una <strong>amplificació visual</strong> que escala linealment entre 10 000 N (mínim visible) i 200 000 N (màxim visible), conservant la proporcionalitat.</p>
+    </div>
+
+    <div class="footer">
+      Fet per Juan Arambul com a complement al tema d'Estructures i Esforços
+    </div>
+  </div>
+
+  <script>
+    // ======== Paràmetres físics (pots canviar-los si vols) ========
+    const L0_m = 2.0;                 // Longitud inicial en metres
+    const A_m2 = 0.05 * 0.05;         // Secció: 50 mm x 50 mm = 0.05 m * 0.05 m = 0.0025 m^2
+    const E_Pa = 200e9;               // Mòdul de Young acer ~ 200 GPa
+
+    // Perquè es veja a la pantalla
+    const BEAM_PX_BASE = 800;         // amplada base de la viga en px (SVG)
+    const VISUAL_MAX_PX = 120;        // píxels extra (estirar) o a restar (contraure) a 200 kN
+    const VISUAL_MIN_FORCE = 10000;   // N
+    const VISUAL_MAX_FORCE = 200000;  // N
+
+    // Elements UI
+    const form = document.getElementById('form');
+    const forceInput = document.getElementById('force');
+    const forceRange = document.getElementById('forceRange');
+    const err = document.getElementById('err');
+    const resetBtn = document.getElementById('reset');
+
+    // Estadístiques
+    const statMode = document.getElementById('statMode');
+    const statF = document.getElementById('statF');
+    const statSigma = document.getElementById('statSigma');
+    const statEps = document.getElementById('statEps');
+    const statDelta = document.getElementById('statDelta');
+    const statLf = document.getElementById('statLf');
+
+    // Etiquetes de constants
+    document.getElementById('L0label').textContent = `${L0_m.toFixed(2)} m`;
+    document.getElementById('Elabel').textContent = `200 GPa`;
+    document.getElementById('Alabel').textContent = `${(A_m2).toFixed(4)} m²`;
+
+    // Escena SVG
+    const beam = document.getElementById('beam');
+    const beamRef = document.getElementById('beamRef');
+    const clampRight = document.getElementById('clampRight');
+    const arrows = document.getElementById('arrows');
+
+    // Estat
+    let mode = 'tension';
+    let F = 10000;
+
+    // Enllaça number <-> range
+    forceInput.addEventListener('input', () => {
+      forceRange.value = forceInput.value;
+    });
+    forceRange.addEventListener('input', () => {
+      forceInput.value = forceRange.value;
+    });
+
+    // Canvis de mode
+    form.addEventListener('change', (e)=>{
+      if(e.target.name === 'mode'){
+        mode = e.target.value; // 'tension' | 'compression'
+        updateScene();
+      }
+    });
+
+    form.addEventListener('submit', (e)=>{
+      e.preventDefault();
+      const val = Number(forceInput.value);
+      if(Number.isNaN(val) || val < 10000 || val > 200000){
+        err.textContent = 'Introdueix un valor entre 10 000 i 200 000 N';
+        return;
+      }
+      err.textContent = '';
+      F = val;
+      updateScene(true);
+    });
+
+    function lerp(a,b,t){ return a + (b-a)*t }
+    function clamp(x,min,max){ return Math.max(min, Math.min(max,x)) }
+
+    function numberFmt(x,dec=0){
+      return x.toLocaleString('ca-ES', {minimumFractionDigits:dec, maximumFractionDigits:dec});
+    }
+
+    function updateScene(animated=false){
+      // Càlculs teòrics
+      const sigma = F / A_m2;          // Pa
+      const eps = sigma / E_Pa;        // adimensional
+      const dL = eps * L0_m;           // m
+      const Lf = L0_m + (mode==='tension' ? dL : -dL);
+
+      // Estadístiques
+      statMode.textContent = mode === 'tension' ? 'Tracció' : 'Compressió';
+      statF.textContent = numberFmt(F);
+      statSigma.textContent = sigma.toExponential(3).replace('e','×10^');
+      statEps.textContent = eps.toExponential(3).replace('e','×10^');
+      statDelta.textContent = `${(dL*1000).toFixed(3)} mm`;
+      statLf.textContent = `${Lf.toFixed(4)} m`;
+
+      // Escalat visual lineal entre 10k i 200k N
+      const t = clamp((F - VISUAL_MIN_FORCE) / (VISUAL_MAX_FORCE - VISUAL_MIN_FORCE), 0, 1);
+      const deltaPx = lerp(0, VISUAL_MAX_PX, t) * (mode==='tension' ? 1 : -1);
+
+      // Animació d'amplada de la viga i posició del suport dret
+      const targetWidth = clamp(BEAM_PX_BASE + deltaPx, 200, 980);
+      if(animated){
+        animateBeamAndClamp(beam, clampRight, targetWidth, 300);
+      } else {
+        beam.setAttribute('width', targetWidth);
+        clampRight.setAttribute('x', targetWidth - 20); // acompanya el límit dret de la viga
+      }
+
+      // Fletxes de càrrega
+      // Mantén la viga de referència sempre a dimensions originals
+      beamRef.setAttribute('width', BEAM_PX_BASE);
+
+      // Fletxes de càrrega col·locades als extrems actuals
+      drawArrows(mode);
+    }
+
+    function animateBeamAndClamp(rect, clamp, targetWidth, duration){
+      const startW = Number(rect.getAttribute('width')) || BEAM_PX_BASE;
+      const diffW = targetWidth - startW;
+      const t0 = performance.now();
+      function step(t){
+        const k = clamp01((t - t0)/duration);
+        const ease = 1 - Math.pow(1-k, 3); // easeOutCubic
+        const w = startW + diffW*ease;
+        rect.setAttribute('width', w);
+        clamp.setAttribute('x', w - 20);
+        if(k < 1) requestAnimationFrame(step);
+      }
+      requestAnimationFrame(step);
+    }
+
+    function clamp01(x){ return Math.max(0, Math.min(1, x)) }
+
+    function drawArrows(mode){
+      arrows.innerHTML = '';
+      const g = document.createElementNS('http://www.w3.org/2000/svg','g');
+      const mkArrow = (x,dir)=>{
+        const line = document.createElementNS('http://www.w3.org/2000/svg','line');
+        line.setAttribute('x1', x + (dir>0? -20:20));
+        line.setAttribute('y1', 70);
+        line.setAttribute('x2', x + (dir>0? -2:2));
+        line.setAttribute('y2', 70);
+        line.setAttribute('stroke', '#38bdf8');
+        line.setAttribute('stroke-width', 4);
+        line.setAttribute('stroke-linecap', 'round');
+        const tri = document.createElementNS('http://www.w3.org/2000/svg','polygon');
+        const pts = dir>0 ? `${x},70 ${x-10},64 ${x-10},76` : `${x},70 ${x+10},64 ${x+10},76`;
+        tri.setAttribute('points', pts);
+        tri.setAttribute('fill','#38bdf8');
+        g.appendChild(line); g.appendChild(tri);
+      }
+      if(mode==='tension'){
+        mkArrow(0, -1);   // esquerra cap enfora
+        mkArrow(Number(beam.getAttribute('width')), +1); // dreta cap enfora, al límit actual
+      } else {
+        mkArrow(0, +1);   // esquerra cap endins
+        mkArrow(Number(beam.getAttribute('width')), -1); // dreta cap endins
+      }
+      arrows.appendChild(g);
+    }
+
+    // Botó Reset
+    resetBtn.addEventListener('click', ()=>{
+      // Mode a Tracció
+      document.getElementById('tension').checked = true;
+      document.getElementById('compression').checked = false;
+      mode = 'tension';
+      // Força a mínim
+      F = 10000;
+      forceInput.value = '10000';
+      forceRange.value = '10000';
+      // Reposiciona viga i suport dret
+      beam.setAttribute('width', BEAM_PX_BASE);
+      clampRight.setAttribute('x', BEAM_PX_BASE - 20);
+      // Actualitza estadístiques i fletxes
+      updateScene(false);
+    });
+
+    // Inicialitza
+    updateScene(false);
+  </script>
+</body>
+</html>
