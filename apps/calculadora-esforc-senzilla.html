@@ -1,0 +1,634 @@
+<!doctype html>
+<html lang="ca">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Calculadora d'Esforç Senzilla — Vibe Coding Educatiu UI</title>
+<link rel="stylesheet" href="../assets/css/shell.css" />
+<style>
+/* ================================
+   🌈 PALETA (NO CANVIAR)
+   ================================ */
+:root{
+  --bg-top:#0b1226;              /* Fons principal: gradient vertical */
+  --bg-bottom:#0f172a;
+  --card: rgba(17,24,39,.75);    /* Targetes/cards */
+  --border: rgba(148,163,184,.15); /* Contorns i divisòries */
+  --border-strong: rgba(148,163,184,.30);
+  --text:#e5e7eb;                /* Text principal */
+  --muted:#94a3b8;               /* Text secundari/muted */
+  --accent:#38bdf8;              /* Accent primari (UI, sliders, icones) */
+  --grad-a:#38bdf8;              /* Gradient destacat en visuals */
+  --grad-b:#a78bfa;
+  --error:#ef4444;               /* Errors validació */
+  --card-radius:16px;
+  --btn-radius:12px;
+  --input-radius:10px;
+  --shadow:0 10px 30px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.03);
+  --transition:300ms cubic-bezier(.22,1,.36,1); /* easeOutCubic */
+}
+
+/* ================================
+   🅰️ TIPOGRAFIA (NO CANVIAR)
+   ================================ */
+html,body{
+  height:100%;
+  background: linear-gradient(to bottom, var(--bg-top), var(--bg-bottom));
+  color: var(--text);
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans";
+}
+body{
+  margin:0;
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+}
+code, .mono{
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New";
+}
+
+/* ================================
+   📐 LAYOUT
+   ================================ */
+nav.top-nav{margin-bottom:12px;}
+.container{
+  max-width:960px;
+  width:100%;
+  margin:0 auto;
+  padding:32px 24px 24px;
+}
+.card > .back-link{margin-bottom:18px;}
+.card{
+  background: var(--card);
+  border:1px solid var(--border);
+  border-radius: var(--card-radius);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  padding:24px;
+}
+h1{
+  font-weight:700;
+  margin:0 0 10px 0;
+  font-size: clamp(22px, 2.8vw, 32px); /* (NO CANVIAR) */
+  letter-spacing:.2px;
+}
+.subtle{
+  color: var(--muted);
+  font-size:.95rem;
+}
+
+/* ================================
+   👆 INPUTS I CONTROL SEGMENTAT
+   ================================ */
+.row{
+  display:grid;
+  gap:16px;
+}
+@media (min-width:760px){
+  .row.cols-2{ grid-template-columns: 1fr 1fr; }
+  .row.cols-3{ grid-template-columns: 1fr 1fr 1fr; }
+}
+
+.field{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+label{
+  color: var(--muted);
+  font-size:.92rem;
+}
+select, input[type="number"], .pill{
+  background:#0f172a;
+  color:var(--text);
+  border:1px solid var(--border-strong);
+  border-radius:var(--input-radius);
+  padding:10px 12px;
+  transition:border-color var(--transition), transform var(--transition), box-shadow var(--transition);
+  outline:none;
+}
+select:focus, input[type="number"]:focus{
+  border-color:var(--accent);
+  box-shadow:0 0 0 3px rgba(56,189,248,.15);
+  transform: translateY(-1px);
+}
+input[type="range"]{
+  width:100%;
+  accent-color: var(--accent); /* (NO CANVIAR) */
+}
+
+/* Segmented control píndola */
+.segmented{
+  display:inline-grid;
+  grid-auto-flow:column;
+  gap:8px;
+  background: #0f172a;
+  padding:6px;
+  border-radius:999px;
+  border:1px solid var(--border-strong);
+}
+.segmented input{ display:none; }
+.segmented label{
+  cursor:pointer;
+  padding:8px 14px;
+  border-radius:999px;
+  color:var(--muted);
+  user-select:none;
+  transition: background var(--transition), color var(--transition), transform var(--transition);
+}
+.segmented input:checked + label{
+  background: var(--accent); /* opció activa */
+  color:#0b1226;             /* text fosc en actiu */
+  font-weight:700;
+  transform: translateY(-1px);
+}
+
+/* ================================
+   🧮 STATS GRID
+   ================================ */
+.stats{
+  display:grid;
+  gap:12px;
+}
+@media (min-width:760px){
+  .stats{ grid-template-columns: repeat(4, 1fr); }
+}
+.stat{
+  background:#0f172a;
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:12px;
+}
+.k{ font-size:12px; color:var(--muted); }
+.v{ font-size:16px; font-weight:700; }
+.v.mono{ letter-spacing:.3px; }
+
+/* ================================
+   🔘 BOTONS
+   ================================ */
+.btn{
+  background: var(--accent);
+  color:#0b1226;
+  border:none;
+  font-weight:700;
+  border-radius: var(--btn-radius);
+  padding:12px 16px;
+  cursor:pointer;
+  transition: transform var(--transition), box-shadow var(--transition), opacity var(--transition);
+}
+.btn:disabled{ opacity:.5; cursor:not-allowed; }
+.btn:hover{ transform: translateY(-1px); box-shadow:0 10px 20px rgba(56,189,248,.2); }
+
+/* ================================
+   ⚠️ VALIDACIÓ
+   ================================ */
+.error{
+  color:var(--error);
+  font-size:.92rem;
+  min-height:1.1em;
+}
+
+/* ================================
+   📊 FORMULES & VISUALS
+   ================================ */
+.formula{
+  background: #0f172a;
+  border:1px dashed var(--border-strong);
+  border-radius:12px;
+  padding:12px;
+  font-size:.98rem;
+}
+.formula .big{
+  display:block;
+  font-size:1.05rem;
+  margin-bottom:6px;
+}
+.formula .sub{
+  color:var(--muted);
+  font-size:.9rem;
+}
+
+/* SVG responsiu de la biga */
+.visual{
+  width:100%;
+  height:220px;
+  border:1px solid var(--border);
+  border-radius:12px;
+  background: linear-gradient(180deg, rgba(56,189,248,.05), rgba(167,139,250,.04));
+  overflow:hidden;
+  position:relative;
+}
+.legend{
+  position:absolute; right:10px; top:10px; display:flex; gap:12px; align-items:center;
+  font-size:.85rem; color:var(--muted);
+}
+.legend span{ display:flex; gap:6px; align-items:center; }
+.bullet{ width:16px; height:6px; border-radius:999px; }
+.bullet.grad{ background: linear-gradient(90deg, var(--grad-a), var(--grad-b)); }
+.bullet.ref{ background: repeating-linear-gradient(90deg, rgba(229,231,235,.7) 0 6px, rgba(229,231,235,0) 6px 12px); }
+
+/* Peu de pàgina (NO MODIFICAR TEXT) */
+footer{
+  margin-top:18px;
+  text-align:center;
+  color:var(--muted);
+  font-size:.9rem;
+}
+.small{ font-size:.85rem; color:var(--muted); }
+</style>
+</head>
+<body>
+  <nav class="top-nav" aria-label="Navegació principal">
+    <a class="logo" href="../index.html"><span>VC</span>Aula d'Estructures</a>
+    <a class="back-link" href="../index.html" aria-label="Torna a la portada de l'Aula d'Estructures">← Torna a l'inici</a>
+  </nav>
+  <main class="container" role="main">
+    <section class="card" aria-labelledby="titol">
+      <h1 id="titol">Calculadora d'esforç (σ) per a tracció/compressió — nivell bàsic</h1>
+      <p class="subtle">App pensada per a l'alumnat amb més dificultats: opcions acotades, fórmules visibles i passos guiats. Totes les xifres es mostren amb format <span class="mono">ca-ES</span>.</p>
+
+      <!-- ===============================
+           PAS 1 · TIPUS D'ESFORÇ
+           =============================== -->
+      <div class="row" style="margin-top:16px;">
+        <div class="field" role="group" aria-label="Tria el tipus d'esforç">
+          <label>1) Tria el tipus d'esforç</label>
+          <div class="segmented" aria-live="polite">
+            <input type="radio" name="mode" id="modeT" value="traccio" checked>
+            <label for="modeT">Tracció</label>
+            <input type="radio" name="mode" id="modeC" value="compressio">
+            <label for="modeC">Compressió</label>
+          </div>
+          <span class="small">Recorda: tracció estira la peça; compressió l'escurça.</span>
+        </div>
+      </div>
+
+      <!-- ===============================
+           PAS 2 · MATERIAL I DIMENSIONS
+           =============================== -->
+      <div class="row cols-3" style="margin-top:18px;">
+        <div class="field">
+          <label for="material">2) Material (Mòdul d'Elasticitat E)</label>
+          <select id="material" aria-label="Material">
+            <option value="200000">Acer (E ≈ 200.000 MPa)</option>
+            <option value="70000">Alumini (E ≈ 70.000 MPa)</option>
+            <option value="11000">Fusta (E ≈ 11.000 MPa)</option>
+            <option value="3500">Plàstic tècnic (E ≈ 3.500 MPa)</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="seccio">3) Secció (àrea A)</label>
+          <select id="seccio" aria-label="Secció">
+            <option value="100">Barra petita — A = 100 mm²</option>
+            <option value="250" selected>Barra mitjana — A = 250 mm²</option>
+            <option value="500">Barra gran — A = 500 mm²</option>
+            <option value="1000">Placa — A = 1.000 mm²</option>
+          </select>
+          <span class="small">Consell: secció més gran → menys tensió per la mateixa força.</span>
+        </div>
+        <div class="field">
+          <label for="longitud">4) Longitud inicial (L)</label>
+          <select id="longitud" aria-label="Longitud">
+            <option value="200">L = 200 mm</option>
+            <option value="300" selected>L = 300 mm</option>
+            <option value="400">L = 400 mm</option>
+            <option value="600">L = 600 mm</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- ===============================
+           PAS 3 · FORÇA APLICADA
+           =============================== -->
+      <div class="row cols-2" style="margin-top:18px;">
+        <div class="field">
+          <label for="forcaNum">5) Força aplicada (F) en N</label>
+          <input id="forcaNum" type="number" inputmode="decimal" step="10" min="0" max="50000" value="1000" aria-describedby="forcaHelp" aria-label="Força en Newtons (nombre)">
+          <span id="forcaHelp" class="small">Mou també el control lliscant. Rang: 0 → 50.000 N</span>
+          <div style="margin-top:6px">
+            <input id="forcaRange" type="range" min="0" max="50000" step="10" value="1000" aria-label="Força en Newtons (lliscant)">
+          </div>
+          <div id="errorForca" class="error" aria-live="polite"></div>
+        </div>
+        <div class="field">
+          <label for="sigmaAdm">6) Límite admissible (σ<sub>adm</sub>)</label>
+          <select id="sigmaAdm" aria-label="Límit admissible de tensió">
+            <option value="80">80 MPa (molt conservador)</option>
+            <option value="120" selected>120 MPa (conservador)</option>
+            <option value="160">160 MPa (estàndard)</option>
+            <option value="220">220 MPa (elevat)</option>
+          </select>
+          <span class="small">Es farà una comparativa de seguretat: σ ≤ σ<sub>adm</sub>?</span>
+        </div>
+      </div>
+
+      <!-- ===============================
+           FORMULES VISIBLES (amb substitució)
+           =============================== -->
+      <div class="row" style="margin-top:8px;">
+        <div class="formula" aria-live="polite">
+          <span class="big">Fórmules clau</span>
+          <div>1) <span class="mono">σ = F / A</span> <span class="sub">→ Tensió (MPa) si F en N i A en mm² (recorda: 1 N/mm² = 1 MPa)</span></div>
+          <div>2) <span class="mono">ε = ΔL / L</span> <span class="sub">→ Deformació (sense unitat)</span></div>
+          <div>3) <span class="mono">σ = E · ε</span> <span class="sub">→ Llei de Hooke (règim elàstic)</span></div>
+          <div>4) <span class="mono">ΔL = F · L / (A · E)</span> <span class="sub">→ Allargament/escurçament teòric</span></div>
+          <hr style="border:none;border-top:1px solid var(--border); margin:10px 0">
+          <div id="substitucions" class="mono" aria-label="Substitució numèrica pas a pas"></div>
+        </div>
+      </div>
+
+      <!-- ===============================
+           VISUAL INTERACTIU (SVG)
+           =============================== -->
+      <div class="row" style="margin-top:14px;">
+        <div class="visual" aria-label="Visualització de la biga">
+          <!-- llegenda -->
+          <div class="legend">
+            <span><i class="bullet ref"></i> referència</span>
+            <span><i class="bullet grad"></i> peça deformada</span>
+          </div>
+          <!-- SVG -->
+          <svg id="svg" viewBox="0 0 900 220" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Biga amb comparativa de deformació">
+            <!-- Límit del suport esquerre (fix) -->
+            <rect x="70" y="40" width="10" height="140" fill="rgba(229,231,235,.35)"/>
+            <!-- Marca dreta referència (segueix la peça sense deformar) -->
+            <rect id="rightRef" x="830" y="40" width="10" height="140" fill="rgba(229,231,235,.35)"/>
+            <!-- Biga referència (discontínua) -->
+            <line x1="80" y1="110" x2="830" y2="110"
+                  stroke="rgba(229,231,235,.7)" stroke-width="10"
+                  stroke-dasharray="16 10" />
+            <!-- Biga deformada (gradient) -->
+            <defs>
+              <linearGradient id="barGrad" x1="0%" x2="100%">
+                <stop offset="0%" stop-color="var(--grad-a)"/>
+                <stop offset="100%" stop-color="var(--grad-b)"/>
+              </linearGradient>
+            </defs>
+            <line id="bar" x1="80" y1="110" x2="830" y2="110"
+                  stroke="url(#barGrad)" stroke-width="14" stroke-linecap="round"/>
+            <!-- Fletxes força -->
+            <g id="arrows"></g>
+          </svg>
+        </div>
+      </div>
+
+      <!-- ===============================
+           RESULTATS (STATS GRID)
+           =============================== -->
+      <div class="row" style="margin-top:14px;">
+        <div class="stats" aria-live="polite">
+          <div class="stat">
+            <div class="k">Tensió σ (MPa)</div>
+            <div id="outSigma" class="v mono">0</div>
+          </div>
+          <div class="stat">
+            <div class="k">Deformació ε (—)</div>
+            <div id="outEps" class="v mono">0</div>
+          </div>
+          <div class="stat">
+            <div class="k">ΔL (mm)</div>
+            <div id="outDeltaL" class="v mono">0</div>
+          </div>
+          <div class="stat">
+            <div class="k">Seguretat (σ ≤ σ<sub>adm</sub>)</div>
+            <div id="outSafe" class="v mono">—</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===============================
+           ACCIONS
+           =============================== -->
+      <div class="row cols-2" style="margin-top:16px; align-items:end;">
+        <div class="field">
+          <label for="pasBuit">Prova tu: completa (σ = F / A) amb els teus valors</label>
+          <input id="pasBuit" class="mono" type="text" placeholder="Ex.: σ = 1000 / 250 = 4 MPa" aria-label="Buit per omplir la substitució manual">
+          <span class="small">Escriu la teua substitució per comprovar-la amb el resultat.</span>
+        </div>
+        <div style="display:flex; gap:10px; justify-content:flex-end;">
+          <button id="btnReset" class="btn" aria-label="Reinicia valors">Reset</button>
+          <button id="btnCalc" class="btn" aria-label="Recalcula">Recalcula</button>
+        </div>
+      </div>
+
+      <footer>Fet per Juan Arambul com a complement al tema d'Estructures i Esforços</footer>
+    </section>
+  </main>
+
+<script>
+/* ======================================================================
+   🧠 JS — ESTRUCTURA
+   - Sync inputs (number <-> range)
+   - Validació i càlculs
+   - Visual SVG amb lerp/clamp i micro-animacions (300 ms easeOutCubic)
+   - Internac.: toLocaleString('ca-ES')
+   ====================================================================== */
+
+/* -----------------------------
+   Utilitats numèriques
+------------------------------*/
+const clamp = (v, a, b) => Math.min(Math.max(v, a), b);
+const easeOutCubic = t => 1 - Math.pow(1 - t, 3);
+const fmt = (x, d=3) => {
+  if (!isFinite(x)) return '—';
+  return Number(x).toLocaleString('ca-ES', {maximumFractionDigits:d});
+};
+
+/* -----------------------------
+   Elements del DOM
+------------------------------*/
+const modeT = document.getElementById('modeT');
+const modeC = document.getElementById('modeC');
+const material = document.getElementById('material');
+const seccio = document.getElementById('seccio');
+const longitud = document.getElementById('longitud');
+const forcaNum = document.getElementById('forcaNum');
+const forcaRange = document.getElementById('forcaRange');
+const sigmaAdm = document.getElementById('sigmaAdm');
+const errorForca = document.getElementById('errorForca');
+
+const outSigma = document.getElementById('outSigma');
+const outEps = document.getElementById('outEps');
+const outDeltaL = document.getElementById('outDeltaL');
+const outSafe = document.getElementById('outSafe');
+const substitucions = document.getElementById('substitucions');
+
+const btnCalc = document.getElementById('btnCalc');
+const btnReset = document.getElementById('btnReset');
+
+const svg = document.getElementById('svg');
+const bar = document.getElementById('bar');
+const rightRef = document.getElementById('rightRef');
+const arrows = document.getElementById('arrows');
+
+/* -----------------------------
+   Sync inputs (number <-> range)
+------------------------------*/
+function syncFromNumber(){
+  const v = Number(forcaNum.value);
+  if (Number.isNaN(v)) return;
+  forcaRange.value = clamp(v, Number(forcaRange.min), Number(forcaRange.max));
+  calc();
+}
+function syncFromRange(){
+  forcaNum.value = forcaRange.value;
+  calc();
+}
+forcaNum.addEventListener('input', syncFromNumber);
+forcaRange.addEventListener('input', syncFromRange);
+
+/* -----------------------------
+   Càlculs principals
+   σ = F/A  (N/mm² = MPa)
+   ΔL = F·L / (A·E)
+   ε = ΔL/L
+------------------------------*/
+function calc(){
+  errorForca.textContent = '';
+  const F = Number(forcaRange.value);           // N
+  const A = Number(seccio.value);               // mm²
+  const L = Number(longitud.value);             // mm
+  const E = Number(material.value);             // MPa ( = N/mm² )
+  const sigAdm = Number(sigmaAdm.value);        // MPa
+
+  // Validació bàsica
+  if (F < 0 || F > 50000){
+    errorForca.textContent = 'La força ha d’estar entre 0 i 50.000 N.';
+    return;
+  }
+
+  // Tensió en MPa (N/mm²)
+  const sigma = F / A;
+
+  // ΔL en mm: ΔL = (F·L)/(A·E)
+  const deltaL = (F * L) / (A * E);
+
+  // ε sense unitat
+  const eps = deltaL / L;
+
+  // Substitucions (pas a pas)
+  substitucions.innerHTML =
+    `σ = F / A = ${fmt(F,3)} / ${fmt(A,3)} = <b>${fmt(sigma,3)} MPa</b><br>` +
+    `ΔL = F·L / (A·E) = (${fmt(F,3)}·${fmt(L,3)}) / (${fmt(A,3)}·${fmt(E,0)}) = <b>${fmt(deltaL,4)} mm</b><br>` +
+    `ε = ΔL / L = ${fmt(deltaL,4)} / ${fmt(L,3)} = <b>${fmt(eps,6)}</b>`;
+
+  // Sortides
+  outSigma.textContent = fmt(sigma,3);
+  outDeltaL.textContent = fmt(deltaL,4);
+  outEps.textContent = fmt(eps,6);
+  outSafe.textContent = (sigma <= sigAdm) ? '✅ Segur' : '⚠️ Supera límit';
+  outSafe.style.color = (sigma <= sigAdm) ? '#22c55e' : '#ef4444';
+
+  // Actualitza visual
+  updateVisual(deltaL);
+}
+
+/* -----------------------------
+   Visual SVG amb micro-animació
+   - Barres límit: esquerra fixa, dreta acompanya la biga deformada.
+   - Tracció: la punta dreta es desplaça a la dreta; Compressió: a l'esquerra.
+------------------------------*/
+let anim = { t:0, fromX2:830, toX2:830, start:0 };
+
+function updateVisual(deltaL){
+  const baseX1 = 80;      // inici biga
+  const baseX2 = 830;     // final biga sense deformar
+  const mode = modeT.checked ? 'traccio' : 'compressio';
+
+  // escala visual: 1 mm de ΔL = 0.7 px (limitat)
+  const pxPerMm = 0.7;
+  let dpx = clamp(deltaL * pxPerMm, -90, 90); // límit per no eixir del canvas
+
+  if (mode === 'compressio') dpx *= -1;
+
+  // acomodar objectiu d'animació
+  anim.fromX2 = Number(bar.getAttribute('x2'));
+  if (!anim.fromX2) anim.fromX2 = baseX2;
+  anim.toX2 = baseX2 + dpx;
+  anim.start = performance.now();
+  anim.t = 0;
+
+  // mou també la barra de referència dreta per "acompanyar" la peça
+  rightRef.setAttribute('x', baseX2 - 0); // referència resta on està (estàtica de fons)
+
+  // Fletxes de força
+  drawArrows(mode, baseX1, baseX2, dpx);
+
+  // arranca anim loop
+  requestAnimationFrame(step);
+}
+
+function step(ts){
+  const dur = 300; // 300 ms
+  const t = clamp((ts - anim.start)/dur, 0, 1);
+  const k = easeOutCubic(t);
+  const x = anim.fromX2 + (anim.toX2 - anim.fromX2)*k;
+  bar.setAttribute('x1', 80);
+  bar.setAttribute('x2', x);
+  if (t < 1) requestAnimationFrame(step);
+}
+
+/* Dibuixa fletxes de força a extrems segons mode */
+function drawArrows(mode, x1, x2, dpx){
+  const y = 110;
+  const len = 34;
+  const thick = 4;
+  arrows.innerHTML = '';
+  const g = document.createElementNS('http://www.w3.org/2000/svg','g');
+  g.setAttribute('stroke', 'var(--accent)');
+  g.setAttribute('stroke-width', thick);
+  g.setAttribute('stroke-linecap', 'round');
+
+  // Tracció: fletxes cap enfora
+  // Compressió: fletxes cap endins
+  if (mode === 'traccio'){
+    // esquerra cap a l'esquerra
+    g.appendChild(line(x1, y, x1 - len, y));
+    // dreta cap a la dreta (punta segons deformació)
+    g.appendChild(line(x2 + dpx, y, x2 + dpx + len, y));
+  }else{
+    // esquerra cap a la dreta
+    g.appendChild(line(x1 - len, y, x1, y));
+    // dreta cap a l'esquerra
+    g.appendChild(line(x2 + dpx + len, y, x2 + dpx, y));
+  }
+  arrows.appendChild(g);
+
+  function line(x1,y1,x2,y2){
+    const L = document.createElementNS('http://www.w3.org/2000/svg','line');
+    L.setAttribute('x1', x1); L.setAttribute('y1', y1);
+    L.setAttribute('x2', x2); L.setAttribute('y2', y2);
+    return L;
+  }
+}
+
+/* -----------------------------
+   Botons
+------------------------------*/
+btnCalc.addEventListener('click', calc);
+btnReset.addEventListener('click', ()=>{
+  modeT.checked = true;
+  material.value = "200000";
+  seccio.value = "250";
+  longitud.value = "300";
+  sigmaAdm.value = "120";
+  forcaRange.value = 1000;
+  forcaNum.value = 1000;
+  document.getElementById('pasBuit').value = '';
+  calc();
+});
+
+/* -----------------------------
+   Accessibilitat: recalcular en canvis
+------------------------------*/
+[modeT, modeC, material, seccio, longitud, sigmaAdm].forEach(el=>{
+  el.addEventListener('change', calc);
+});
+
+/* Inici */
+calc();
+</script>
+</body>
+</html>

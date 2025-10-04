@@ -1,1 +1,148 @@
-<!doctype html><title>placeholder</title>
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Aula d'Estructures · Vibe Coding Educatiu UI</title>
+  <link rel="stylesheet" href="assets/css/shell.css" />
+  <style>
+    :root{
+      --bg-top:#0b1226;
+      --bg-bottom:#0f172a;
+      --card:rgba(17,24,39,.78);
+      --border:rgba(148,163,184,.18);
+      --border-strong:rgba(148,163,184,.35);
+      --text:#e5e7eb;
+      --muted:#94a3b8;
+      --accent:#38bdf8;
+      --accent-2:#a78bfa;
+      --shadow:0 18px 45px rgba(0,0,0,.42);
+      --radius:18px;
+      --dur:220ms;
+      --ease:cubic-bezier(.22,1,.36,1);
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      min-height:100vh;
+      font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans";
+      color:var(--text);
+      background:linear-gradient(to bottom,var(--bg-top),var(--bg-bottom));
+      display:flex;
+      flex-direction:column;
+    }
+    main{
+      width:100%;
+      max-width:1040px;
+      margin:0 auto;
+      padding:72px 24px 64px;
+      display:grid;
+      gap:36px;
+    }
+    header{
+      display:grid;
+      gap:12px;
+    }
+    h1{
+      margin:0;
+      font-size:clamp(32px,6vw,46px);
+      font-weight:800;
+      letter-spacing:.4px;
+    }
+    .intro{
+      margin:0;
+      max-width:720px;
+      color:var(--muted);
+      font-size:clamp(16px,3vw,18px);
+      line-height:1.6;
+    }
+    .apps-grid{
+      display:grid;
+      gap:20px;
+      grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    }
+    .app-card{
+      display:flex;
+      flex-direction:column;
+      gap:14px;
+      background:var(--card);
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      padding:24px;
+      text-decoration:none;
+      color:var(--text);
+      box-shadow:var(--shadow);
+      transition:border-color var(--dur) var(--ease), transform var(--dur) var(--ease);
+    }
+    .app-card:hover,
+    .app-card:focus-visible{
+      border-color:var(--border-strong);
+      transform:translateY(-3px);
+      outline:none;
+    }
+    .app-icon{
+      width:56px;
+      height:56px;
+      border-radius:16px;
+      background:linear-gradient(135deg,var(--accent),var(--accent-2));
+      display:grid;
+      place-items:center;
+      font-size:26px;
+      font-weight:700;
+      color:#0b1226;
+    }
+    .app-card h2{
+      margin:0;
+      font-size:20px;
+      font-weight:700;
+    }
+    .app-card p{
+      margin:0;
+      color:var(--muted);
+      font-size:15px;
+      line-height:1.5;
+    }
+    footer{
+      text-align:center;
+      padding:0 24px 36px;
+      color:var(--muted);
+      font-size:13px;
+    }
+  </style>
+</head>
+<body>
+  <nav class="site-nav" aria-label="Navegació principal">
+    <a class="logo" href="index.html"><span>VC</span>Aula d'Estructures</a>
+  </nav>
+  <main>
+    <header>
+      <h1>Aula d'Estructures i Esforços</h1>
+      <p class="intro">Col·lecció d'eines interactives per experimentar amb tracció, compressió i càlculs d'esforços dins de les activitats de tecnologia. Clica una app per obrir-la.</p>
+    </header>
+
+    <section class="apps-grid" id="apps" aria-label="Llistat d'aplicacions">
+      <a class="app-card" href="apps/calculadora-traccio.html">
+        <div class="app-icon" aria-hidden="true">σ</div>
+        <h2>Calculadora d'Esforç de Tracció / Compressió</h2>
+        <p>Calcula tensió, deformació i conversions d'unitats amb diferents formes de secció.</p>
+      </a>
+      <a class="app-card" href="apps/simulador-esforcos.html">
+        <div class="app-icon" aria-hidden="true">⇆</div>
+        <h2>Simulador d'Esforços</h2>
+        <p>Visualitza com canvia una biga sota tracció o compressió segons la força aplicada.</p>
+      </a>
+      <a class="app-card" href="apps/calculadora-esforc-senzilla.html">
+        <div class="app-icon" aria-hidden="true">ΔL</div>
+        <h2>Calculadora d'Esforç Senzilla</h2>
+        <p>Recorregut pas a pas per calcular σ, ε i ΔL amb valors predefinits i fórmules visibles.</p>
+      </a>
+      <a class="app-card" href="apps/esforcos-mobil.html">
+        <div class="app-icon" aria-hidden="true">📱</div>
+        <h2>Esforços versió mòbil</h2>
+        <p>Calcula esforços i àrees en una interfície pensada específicament per a pantalles de mòbil.</p>
+      </a>
+    </section>
+  </main>
+  <footer>Fet per Juan Arambul com a complement al tema d'Estructures i Esforços</footer>
+</body>
+</html>
